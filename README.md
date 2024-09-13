@@ -9,6 +9,8 @@ As requested, it parses log lines for destination port and protocol values and m
   Java has also been my primary language for past few years.
 - Why declare so many types? For extensibility and modularity. It also provides automatic type safety and opportunity to check our inputs.
 - For "Port/Protocol Combination Counts" I have assumed the meaning to be destination port / protocol combination counts
+- It is assumed that each log line will have same number of tokens and positions of values will not change. If this changes, the line is skipped.
+- Added a precheck to only parse lines with version 2
 
 ## Requirements
 - Java 11 or above

@@ -36,9 +36,8 @@ public class flowLogHelper {
         writeOutput();
     }
 
-    public void stop() {
-
-    }
+    // This can be used for any cleanups
+    public void stop() {}
 
     private void buildDestinationTags() throws IOException {
         // Attempt to read the CSV file with tagging information and build a map
