@@ -126,6 +126,8 @@ public class flowLogHelper {
             }
         } catch (IOException e) {
             System.out.println("[ERROR] Cannot read log file: " + e.getMessage());
+            // Dont write output, error out
+            System.exit(1);
         }
     }
 
