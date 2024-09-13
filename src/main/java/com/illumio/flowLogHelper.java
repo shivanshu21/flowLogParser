@@ -22,6 +22,7 @@ public class flowLogHelper {
     protocolProvider protoProvider;
     String logFilePath;
     String tagFilePath;
+    Integer untaggedLines = 0;
 
     flowLogHelper(String logFilePath, String tagFilePath) {
         protoProvider = new protocolProvider();
@@ -117,6 +118,9 @@ public class flowLogHelper {
                         }
                         tagCounts.put(tag, tagCounts.get(tag) + 1);
                     }
+                } else {
+                    // count this line as untagged
+                    untaggedLines += 1;
                 }
                 // bump up destination to count mapping
                 if (!destinationCount.containsKey(lineDST)) {
@@ -141,6 +145,9 @@ public class flowLogHelper {
                 writer.write(entry.getKey() + "," + entry.getValue());
                 writer.newLine();
             }
+            writer.write("Untagged" + "," + this.untaggedLines);
+            writer.newLine();
+            writer.newLine();
             writer.write("Port/Protocol Combination Counts:");
             writer.newLine();
             writer.write("Port,Protocol,Count");
