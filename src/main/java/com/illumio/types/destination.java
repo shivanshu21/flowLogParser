@@ -1,5 +1,7 @@
 package com.illumio.types;
 
+import java.util.Objects;
+
 public class destination implements Comparable<destination> {
     private protocol proto;
     private Integer port;
@@ -18,7 +20,7 @@ public class destination implements Comparable<destination> {
      */
     @Override
     public int compareTo(destination o) {
-        if (!this.proto.equals(o.proto)) {
+        if (!this.proto.getName().equals(o.proto.getName())) {
             return 1;
         }
         if (this.port > o.port) {
@@ -27,5 +29,22 @@ public class destination implements Comparable<destination> {
             return -1;
         }
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        destination that = (destination) o;
+        return Objects.equals(proto.getName(), that.proto.getName()) && Objects.equals(port, that.port);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(proto.getName(), port);
+    }
+
+    public String toString() {
+        return String.valueOf(port) + "," + this.proto.getName() + ",";
     }
 }

@@ -5,8 +5,10 @@ import com.illumio.types.destination;
 import com.illumio.types.protocol;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +33,7 @@ public class flowLogHelper {
     public void start() throws IOException {
         buildDestinationTags();
         readLogsAndCount();
-        // write output
+        writeOutput();
     }
 
     public void stop() {
@@ -48,14 +50,6 @@ public class flowLogHelper {
             // now continue with reading csv
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                System.out.println(
-                    "[INFO] Reading DST port: " +
-                        values[0] +
-                        ", Protocol: "
-                        + values[1] +
-                        ", Tag: " +
-                        values[2]
-                );
                 protocol x = protoProvider.getProtocolByName(values[1]);
                 destination d = new destination(x, Integer.parseInt(values[0]));
                 if (!destinationTags.containsKey(d)) {
@@ -103,7 +97,6 @@ public class flowLogHelper {
                     // Process other lines
                     continue;
                 }
-
                 boolean skipLine = false;
                 destination lineDST = null;
                 try {
@@ -118,7 +111,7 @@ public class flowLogHelper {
                     continue;
                 }
                 // bump up tag count
-                if (lineDST != null && destinationTags.containsKey(lineDST)) {
+                if (destinationTags.containsKey(lineDST)) {
                     for (String tag : destinationTags.get(lineDST)) {
                         if (!tagCounts.containsKey(tag)) {
                             tagCounts.put(tag, 0);
@@ -126,9 +119,37 @@ public class flowLogHelper {
                         tagCounts.put(tag, tagCounts.get(tag) + 1);
                     }
                 }
+                // bump up destination to count mapping
+                if (!destinationCount.containsKey(lineDST)) {
+                    destinationCount.put(lineDST, 0);
+                }
+                destinationCount.put(lineDST, destinationCount.get(lineDST) + 1);
             }
         } catch (IOException e) {
             System.out.println("[ERROR] Cannot read log file: " + e.getMessage());
+        }
+    }
+
+    private void writeOutput() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"))) {
+            writer.write("Tag counts:");
+            writer.newLine();
+            writer.write("Tag,Count");
+            writer.newLine();
+            for (Map.Entry<String, Integer> entry : tagCounts.entrySet()) {
+                writer.write(entry.getKey() + "," + entry.getValue());
+                writer.newLine();
+            }
+            writer.write("Port/Protocol Combination Counts:");
+            writer.newLine();
+            writer.write("Port,Protocol,Count");
+            writer.newLine();
+            for (Map.Entry<destination, Integer> entry : destinationCount.entrySet()) {
+                writer.write(entry.getKey().toString() + entry.getValue());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e.getMessage());
         }
     }
 }
